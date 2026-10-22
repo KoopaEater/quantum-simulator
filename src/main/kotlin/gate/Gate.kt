@@ -1,6 +1,6 @@
 package dk.maxkandersen.gate
 
-import dk.maxkandersen.qubit.Qubit
+import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.util.pretty
 import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.CommonOps_ZDRM
@@ -8,10 +8,10 @@ import org.ejml.dense.row.CommonOps_ZDRM
 
 interface Gate {
     val matrix: ZMatrixRMaj
-    infix fun apply(state: Qubit): Qubit {
+    infix fun apply(state: QState): QState {
         val newStateMatrix = ZMatrixRMaj(state.tensor.numRows, state.tensor.numCols)
         CommonOps_ZDRM.mult(matrix, state.tensor, newStateMatrix)
-        return Qubit(newStateMatrix)
+        return QState(newStateMatrix)
     }
     val pretty: String get() = matrix.pretty
     infix fun seq(other: Gate): Gate {
