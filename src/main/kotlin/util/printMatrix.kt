@@ -1,6 +1,7 @@
 package dk.maxkandersen.util
 
 import org.ejml.data.ZMatrixRMaj
+import java.util.Locale
 import kotlin.math.abs
 
 val ZMatrixRMaj.pretty: String
@@ -16,7 +17,7 @@ val ZMatrixRMaj.pretty: String
 
                 // Format complex number: e.g., 2.30 + 1.50i
                 val sign = if (im >= 0) "+" else "-"
-                sb.append(String.format("%.2f %s %.2fi", re, sign, abs(im)))
+                sb.append(String.format(Locale.ROOT, "%.2f %s %.2fi", re, sign, abs(im)))
 
                 if (c < numCols - 1) sb.append(",  ")
             }
