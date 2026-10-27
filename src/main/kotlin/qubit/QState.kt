@@ -1,40 +1,27 @@
 package dk.maxkandersen.qubit
 
 import dk.maxkandersen.util.kron
+import dk.maxkandersen.util.minus
 import dk.maxkandersen.util.pretty
+import dk.maxkandersen.util.one
+import dk.maxkandersen.util.zero
+import dk.maxkandersen.util.plus
 import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.MatrixFeatures_ZDRM
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.math.sqrt
 
 class QState(val tensor: ZMatrixRMaj) {
 
     companion object {
 
-        fun zero() = QState(ZMatrixRMaj(
-            2, 1, true,
-            1.0, 0.0,
-            0.0, 0.0
-        ))
+        fun zero() = QState(zero)
 
-        fun one() = QState(ZMatrixRMaj(
-            2, 1, true,
-            0.0, 0.0,
-            1.0, 0.0
-        ))
+        fun one() = QState(one)
 
-        fun plus() = QState(ZMatrixRMaj(
-            2, 1, true,
-            1/sqrt(2.0), 0.0,
-            1/sqrt(2.0), 0.0
-        ))
+        fun plus() = QState(plus)
 
-        fun minus() = QState(ZMatrixRMaj(
-            2, 1, true,
-            1/sqrt(2.0), 0.0,
-            -1/sqrt(2.0), 0.0
-        ))
+        fun minus() = QState(minus)
 
         fun baseState(qubits: Int): QState {
             var state = zero()
