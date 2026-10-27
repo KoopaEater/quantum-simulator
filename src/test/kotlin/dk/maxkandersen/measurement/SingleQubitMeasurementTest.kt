@@ -1,0 +1,99 @@
+package dk.maxkandersen.measurement
+
+import dk.maxkandersen.measure.SingleQubitMeasurement
+import dk.maxkandersen.qubit.QState
+import dk.maxkandersen.random.FixedRandomStrategy
+import dk.maxkandersen.testutil.Assertions.assertIdentical
+import dk.maxkandersen.util.minus
+import dk.maxkandersen.util.one
+import dk.maxkandersen.util.plus
+import dk.maxkandersen.util.zero
+import kotlin.test.Test
+
+class SingleQubitMeasurementTest {
+    val q0 = QState.zero()
+    val q1 = QState.one()
+    val qp = QState.plus()
+    val qm = QState.minus()
+    val qn1 = QState.negOne()
+    val qnm = QState.negMinus()
+
+    val rand0 = FixedRandomStrategy(0.0)
+    val rand1 = FixedRandomStrategy(0.9)
+
+    @Test
+    fun plusMeasuresCorrectlyOnto01Basis() {
+        val measurer0 = SingleQubitMeasurement(0, 1, zero, one, rand0)
+        val out0 = measurer0.measure(qp)
+        assertIdentical(q0, out0)
+
+        val measurer1 = SingleQubitMeasurement(0, 1, zero, one, rand1)
+        val out1 = measurer1.measure(qp)
+        assertIdentical(q1, out1)
+    }
+
+    @Test
+    fun minusMeasuresCorrectlyOnto01Basis() {
+        val measurer0 = SingleQubitMeasurement(0, 1, zero, one, rand0)
+        val out0 = measurer0.measure(qm)
+        assertIdentical(q0, out0)
+
+        val measurer1 = SingleQubitMeasurement(0, 1, zero, one, rand1)
+        val out1 = measurer1.measure(qm)
+        assertIdentical(qn1, out1)
+    }
+
+    @Test
+    fun zeroMeasuresCorrectlyOntoPMBasis() {
+        val measurer0 = SingleQubitMeasurement(0, 1, plus, minus, rand0)
+        val out0 = measurer0.measure(q0)
+        assertIdentical(qp, out0)
+
+        val measurer1 = SingleQubitMeasurement(0, 1, plus, minus, rand1)
+        val out1 = measurer1.measure(q0)
+        assertIdentical(qm, out1)
+    }
+
+    @Test
+    fun oneMeasuresCorrectlyOntoPMBasis() {
+        val measurer0 = SingleQubitMeasurement(0, 1, plus, minus, rand0)
+        val out0 = measurer0.measure(q1)
+        assertIdentical(qp, out0)
+
+        val measurer1 = SingleQubitMeasurement(0, 1, plus, minus, rand1)
+        val out1 = measurer1.measure(q1)
+        assertIdentical(qnm, out1)
+    }
+
+    @Test
+    fun basisOntoSameBasisDoesNotChange() {
+        val measurer0 = SingleQubitMeasurement(0, 1, zero, one, rand0)
+        val measurer1 = SingleQubitMeasurement(0, 1, zero, one, rand1)
+
+        val out00 = measurer0.measure(q0)
+        assertIdentical(q0, out00)
+        val out10 = measurer1.measure(q0)
+        assertIdentical(q0, out10)
+
+        val out01 = measurer0.measure(q1)
+        assertIdentical(q1, out01)
+        val out11 = measurer1.measure(q1)
+        assertIdentical(q1, out11)
+    }
+
+    @Test
+    fun singleMeasureOnMultiStateIsCorrect() {
+        val qpp = qp kron qp
+
+        val measurer0 = SingleQubitMeasurement(1, 2, rand = rand0)
+        val out0 = measurer0.measure(qpp)
+        val expected0 = qp kron q0
+        assertIdentical(expected0, out0)
+
+        val measurer1 = SingleQubitMeasurement(1, 2, rand = rand1)
+        val out1 = measurer1.measure(qpp)
+        val expected1 = qp kron q1
+        assertIdentical(expected1, out1)
+    }
+
+}

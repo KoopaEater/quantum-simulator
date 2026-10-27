@@ -10,18 +10,22 @@ import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.MatrixFeatures_ZDRM
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.sqrt
 
 class QState(val tensor: ZMatrixRMaj) {
 
     companion object {
 
         fun zero() = QState(zero)
-
         fun one() = QState(one)
-
         fun plus() = QState(plus)
-
         fun minus() = QState(minus)
+        fun negOne() = QState(ZMatrixRMaj( 2, 1, true,
+            0.0, 0.0,
+            -1.0, 0.0))
+        fun negMinus() = QState(ZMatrixRMaj( 2, 1, true,
+            -1/sqrt(2.0), 0.0,
+            1/sqrt(2.0), 0.0))
 
         fun baseState(qubits: Int): QState {
             var state = zero()
