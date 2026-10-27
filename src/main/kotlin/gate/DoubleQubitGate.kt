@@ -9,7 +9,8 @@ interface DoubleQubitGate : Gate {
         }
         val multiGate = MultiGate(gates)
         val swapGate1 = SwapGate(q1, 0, numQubits)
-        val swapGate2 = SwapGate(q2, 1, numQubits)
+        val q2n = if (q2 == 0) q1 else q2
+        val swapGate2 = SwapGate(q2n, 1, numQubits)
         return swapGate1 seq swapGate2 seq multiGate seq swapGate2 seq swapGate1
     }
 }
