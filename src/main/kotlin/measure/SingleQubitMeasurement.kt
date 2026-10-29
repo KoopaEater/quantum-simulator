@@ -20,7 +20,6 @@ class SingleQubitMeasurement(val qubit: Int, val numQubits: Int, val basis0: ZMa
     override fun measure(state: QState): QState {
         val M0 = getProjMatrix(basis0)
         val M0k = makeFullRegister(M0, qubit, numQubits)
-
         val w0 = M0k mmul state.tensor
         val norm0 = norm(w0)
         val p0 = norm0 * norm0
