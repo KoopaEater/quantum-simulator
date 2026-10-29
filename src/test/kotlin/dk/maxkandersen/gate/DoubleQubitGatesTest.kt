@@ -1,5 +1,6 @@
 package dk.maxkandersen.gate
 
+import dk.maxkandersen.action.gate.CNOTGate
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.testutil.Assertions.assertIdentical
 import kotlin.test.Test

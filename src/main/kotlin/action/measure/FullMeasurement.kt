@@ -1,4 +1,4 @@
-package dk.maxkandersen.measure
+package dk.maxkandersen.action.measure
 
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.random.RandomStrategy
@@ -8,7 +8,6 @@ import dk.maxkandersen.util.dagger
 import dk.maxkandersen.util.expand
 import dk.maxkandersen.util.mmul
 import dk.maxkandersen.util.one
-import dk.maxkandersen.util.pretty
 import dk.maxkandersen.util.zero
 import org.ejml.data.ZMatrixRMaj
 

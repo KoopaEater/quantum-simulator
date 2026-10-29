@@ -1,4 +1,4 @@
-package dk.maxkandersen.gate
+package dk.maxkandersen.action.gate
 
 import dk.maxkandersen.util.kron
 import org.ejml.data.ZMatrixRMaj

@@ -1,6 +1,6 @@
 package dk.maxkandersen.measurement
 
-import dk.maxkandersen.measure.FullMeasurement
+import dk.maxkandersen.action.measure.FullMeasurement
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.random.FixedRandomStrategy
 import dk.maxkandersen.testutil.Assertions.assertIdentical

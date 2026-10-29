@@ -1,4 +1,4 @@
-package dk.maxkandersen.gate
+package dk.maxkandersen.action.gate
 
 interface DoubleQubitGate : Gate {
     fun generateMultiGate(q1: Int, q2: Int, numQubits: Int): Gate {

@@ -1,7 +1,6 @@
-package dk.maxkandersen.gate
+package dk.maxkandersen.action.gate
 
 import dk.maxkandersen.util.ident2
-import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.CommonOps_ZDRM
 
 class IDGate : SingleQubitGate {

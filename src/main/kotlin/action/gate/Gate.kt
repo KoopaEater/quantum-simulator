@@ -1,14 +1,15 @@
-package dk.maxkandersen.gate
+package dk.maxkandersen.action.gate
 
+import dk.maxkandersen.action.Action
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.util.mmul
 import dk.maxkandersen.util.pretty
 import org.ejml.data.ZMatrixRMaj
 
 
-interface Gate {
+interface Gate : Action {
     val matrix: ZMatrixRMaj
-    infix fun apply(state: QState): QState {
+    override infix fun apply(state: QState): QState {
         val newStateMatrix = matrix mmul state.tensor
         return QState(newStateMatrix)
     }

@@ -1,4 +1,4 @@
-package dk.maxkandersen.gate
+package dk.maxkandersen.action.gate
 
 import org.ejml.data.ZMatrixRMaj
 import kotlin.math.cos

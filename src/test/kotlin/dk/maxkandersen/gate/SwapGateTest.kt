@@ -1,5 +1,6 @@
 package dk.maxkandersen.gate
 
+import dk.maxkandersen.action.gate.SwapGate
 import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.CommonOps_ZDRM
 import kotlin.test.Test
