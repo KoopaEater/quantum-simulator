@@ -1,4 +1,4 @@
-package dk.maxkandersen.measurement
+package dk.maxkandersen.action.measurement
 
 import dk.maxkandersen.action.measure.FullMeasurement
 import dk.maxkandersen.qubit.QState
