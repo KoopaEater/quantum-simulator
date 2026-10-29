@@ -56,3 +56,32 @@ infix fun ZMatrixRMaj.ediv(divisor: Double): ZMatrixRMaj {
 }
 
 fun norm(tensor: ZMatrixRMaj) = NormOps_ZDRM.normF(tensor)
+
+// Courtesy of Gemini
+infix fun ZMatrixRMaj.concat(other: ZMatrixRMaj): ZMatrixRMaj {
+    require(this.numRows == other.numRows) { "Vectors must have matching row counts" }
+    // Allocate combined matrix (e.g., 2 x 2)
+    val result = ZMatrixRMaj(this.numRows, this.numCols + other.numCols)
+    // Insert v0 at column 0
+    CommonOps_ZDRM.extract(this, 0, this.numRows, 0, this.numCols, result, 0, 0)
+    // Insert v1 at column 1 (starting at dstX0 = v0.numCols)
+    CommonOps_ZDRM.extract(other, 0, other.numRows, 0, other.numCols, result, 0, this.numCols)
+    return result
+}
+
+fun ZMatrixRMaj.dagger(): ZMatrixRMaj {
+    val result = ZMatrixRMaj(this.numRows, this.numCols)
+    CommonOps_ZDRM.transposeConjugate(this, result)
+    return result
+}
+
+fun ZMatrixRMaj.expand(numQubits: Int): ZMatrixRMaj {
+    require(this.numRows == this.numCols) { "Matrix must be square" }
+    require(this.numRows == 2) { "Matrix must be 2x2" }
+    var result = ZMatrixRMaj(1, 1, true,
+        1.0, 0.0)
+    for (i in 0 until numQubits) {
+        result = result kron this
+    }
+    return result
+}
