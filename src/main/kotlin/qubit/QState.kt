@@ -14,6 +14,11 @@ import kotlin.math.sqrt
 
 class QState(val tensor: ZMatrixRMaj) {
 
+    init {
+        require(tensor.numCols == 1) { "QState tensor must be a column vector (Nx1), got ${tensor.numRows}x${tensor.numCols}" }
+        require(tensor.numRows >= 2 && (tensor.numRows and (tensor.numRows - 1)) == 0) { "QState tensor must have 2^n rows for n >= 1 qubits, got ${tensor.numRows} rows" }
+    }
+
     companion object {
 
         fun zero() = QState(zero)
@@ -28,6 +33,7 @@ class QState(val tensor: ZMatrixRMaj) {
             1/sqrt(2.0), 0.0))
 
         fun baseState(qubits: Int): QState {
+            require(qubits >= 1) { "Cannot create a base state of $qubits qubits; need at least 1" }
             var state = zero()
             for (i in 1 until qubits) {
                 state = state kron zero()

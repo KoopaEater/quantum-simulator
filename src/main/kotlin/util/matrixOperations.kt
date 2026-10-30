@@ -23,6 +23,7 @@ val ident2 = ZMatrixRMaj(2, 2, true,
     0.0, 0.0, 1.0, 0.0)
 
 fun getProjMatrix(matrix: ZMatrixRMaj): ZMatrixRMaj {
+    require(matrix.numCols == 1) { "Projection basis must be a column vector (Nx1), got ${matrix.numRows}x${matrix.numCols}" }
     val proj = ZMatrixRMaj(matrix.numRows, matrix.numRows)
     CommonOps_ZDRM.multTransB(matrix, matrix, proj)
     return proj
@@ -33,23 +34,15 @@ val proj1 = getProjMatrix(one)
 val projp = getProjMatrix(plus)
 val projm = getProjMatrix(minus)
 
-fun makeFullRegister(M: ZMatrixRMaj, k: Int, n: Int): ZMatrixRMaj {
-    var Mk = ZMatrixRMaj(1, 1, true,
-        1.0, 0.0)
-    for (i in 0 until n) {
-        val m = if (i == k) M else ident2
-        Mk = Mk kron m
-    }
-    return Mk
-}
-
 infix fun ZMatrixRMaj.mmul(other: ZMatrixRMaj): ZMatrixRMaj {
+    require(this.numCols == other.numRows) { "Matrix dimension mismatch: cannot multiply a ${this.numRows}x${this.numCols} matrix by a ${other.numRows}x${other.numCols} matrix" }
     val result = ZMatrixRMaj(this.numRows, other.numCols)
     CommonOps_ZDRM.mult(this, other, result)
     return result
 }
 
 infix fun ZMatrixRMaj.ediv(divisor: Double): ZMatrixRMaj {
+    require(divisor != 0.0) { "Cannot divide a matrix by zero" }
     val result = ZMatrixRMaj(this.numRows, this.numCols)
     CommonOps_ZDRM.elementDivide(this, divisor, 0.0, result)
     return result
@@ -78,6 +71,7 @@ fun ZMatrixRMaj.dagger(): ZMatrixRMaj {
 fun ZMatrixRMaj.expand(numQubits: Int): ZMatrixRMaj {
     require(this.numRows == this.numCols) { "Matrix must be square" }
     require(this.numRows == 2) { "Matrix must be 2x2" }
+    require(numQubits >= 1) { "Cannot expand a matrix to $numQubits qubits; need at least 1" }
     var result = ZMatrixRMaj(1, 1, true,
         1.0, 0.0)
     for (i in 0 until numQubits) {
@@ -88,6 +82,8 @@ fun ZMatrixRMaj.expand(numQubits: Int): ZMatrixRMaj {
 fun ZMatrixRMaj.expandWithID(qubit: Int, numQubits: Int): ZMatrixRMaj {
     require(this.numRows == this.numCols) { "Matrix must be square" }
     require(this.numRows == 2) { "Matrix must be 2x2" }
+    require(numQubits >= 1) { "Cannot expand a matrix to $numQubits qubits; need at least 1" }
+    require(qubit in 0 until numQubits) { "Qubit index $qubit is out of range for $numQubits qubits (valid: 0..${numQubits - 1})" }
     var result = ZMatrixRMaj(1, 1, true,
         1.0, 0.0)
     for (i in 0 until numQubits) {
