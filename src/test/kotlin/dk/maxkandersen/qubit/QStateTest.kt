@@ -3,7 +3,7 @@ package dk.maxkandersen.qubit
 import dk.maxkandersen.testutil.Assertions.assertEqual
 import kotlin.test.Test
 
-class QubitTest {
+class QStateTest {
     val q0 = QState.zero()
     val q1 = QState.one()
     val qp = QState.plus()
