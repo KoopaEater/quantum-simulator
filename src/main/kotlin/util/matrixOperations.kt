@@ -48,6 +48,12 @@ infix fun ZMatrixRMaj.ediv(divisor: Double): ZMatrixRMaj {
     return result
 }
 
+infix fun ZMatrixRMaj.emul(scalar: Double): ZMatrixRMaj {
+    val result = ZMatrixRMaj(this)
+    CommonOps_ZDRM.scale(scalar, 0.0, result)
+    return result
+}
+
 fun norm(tensor: ZMatrixRMaj) = NormOps_ZDRM.normF(tensor)
 
 // Courtesy of Gemini
