@@ -1,7 +1,10 @@
 package dk.maxkandersen.qubit
 
+import dk.maxkandersen.random.FixedRandomStrategy
 import dk.maxkandersen.testutil.Assertions.assertEqual
+import dk.maxkandersen.util.norm
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class QStateTest {
     val q0 = QState.zero()
@@ -26,6 +29,13 @@ class QStateTest {
     fun multipleQubitsPrintCorrectBitstrings() {
         val bitstring00 = q00.asBitStrings()
         assertEqual("(1.000 + 0.000i)|00>", bitstring00)
+    }
+
+    @Test
+    fun randomStateHasNormOneAndCorrectSize() {
+        val r = QState.random(2, FixedRandomStrategy(0.75))
+        assertEquals(2, r.nQubits)
+        assertEquals(1.0, norm(r.tensor), 1e-12)
     }
 
 }
