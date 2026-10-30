@@ -18,9 +18,9 @@ val minus = ZMatrixRMaj(2, 1, true,
     1/sqrt(2.0), 0.0,
     -1/sqrt(2.0), 0.0)
 
-val ident2 = ZMatrixRMaj(2, 2, true,
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0)
+fun ident(dim: Int): ZMatrixRMaj = CommonOps_ZDRM.identity(dim)
+val ident2 = ident(2)
+
 
 fun getProjMatrix(matrix: ZMatrixRMaj): ZMatrixRMaj {
     require(matrix.numCols == 1) { "Projection basis must be a column vector (Nx1), got ${matrix.numRows}x${matrix.numCols}" }
@@ -65,6 +65,14 @@ infix fun ZMatrixRMaj.concat(other: ZMatrixRMaj): ZMatrixRMaj {
     CommonOps_ZDRM.extract(this, 0, this.numRows, 0, this.numCols, result, 0, 0)
     // Insert v1 at column 1 (starting at dstX0 = v0.numCols)
     CommonOps_ZDRM.extract(other, 0, other.numRows, 0, other.numCols, result, 0, this.numCols)
+    return result
+}
+
+fun ZMatrixRMaj.put(other: ZMatrixRMaj, atRow: Int, atCol: Int): ZMatrixRMaj {
+    require(atRow >= 0 && atCol >= 0) { "Insertion offset must be non-negative, got (row=$atRow, col=$atCol)" }
+    require(atRow + other.numRows <= numRows && atCol + other.numCols <= numCols) { "Cannot put a ${other.numRows}x${other.numCols} matrix at (row=$atRow, col=$atCol) into a ${numRows}x${numCols} matrix: it does not fit" }
+    val result = this
+    CommonOps_ZDRM.extract(other, 0, other.numRows, 0, other.numCols, result, atRow, atCol)
     return result
 }
 

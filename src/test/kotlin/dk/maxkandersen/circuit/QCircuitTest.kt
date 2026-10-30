@@ -18,6 +18,7 @@ class QCircuitTest {
     val q1 = QState.one()
     val qp = QState.plus()
     val qm = QState.minus()
+    val b00 = QState.b00()
 
     @Test
     fun setStartStateWorksCorrectly() {
@@ -117,6 +118,16 @@ class QCircuitTest {
         c1.addAction(FullMeasurement(2, rand = FixedRandomStrategy(0.9)))
         val res1 = c1.run()
         assertIdentical(q1 kron q1, res1)
+    }
+
+    @Test
+    fun teleportationWorksCorrectly() {
+        val c = QCircuit(3)
+        val psi = QState.random(1)
+        c.setStartState(psi kron b00)
+        c.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c.addAction(HGate().expandWithID(0, 3))
+        // NOT FINISHED
     }
 
 }
