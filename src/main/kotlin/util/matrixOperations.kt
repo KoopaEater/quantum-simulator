@@ -85,3 +85,13 @@ fun ZMatrixRMaj.expand(numQubits: Int): ZMatrixRMaj {
     }
     return result
 }
+fun ZMatrixRMaj.expandWithID(qubit: Int, numQubits: Int): ZMatrixRMaj {
+    require(this.numRows == this.numCols) { "Matrix must be square" }
+    require(this.numRows == 2) { "Matrix must be 2x2" }
+    var result = ZMatrixRMaj(1, 1, true,
+        1.0, 0.0)
+    for (i in 0 until numQubits) {
+        result = result kron if (i == qubit) this else ident2
+    }
+    return result
+}
