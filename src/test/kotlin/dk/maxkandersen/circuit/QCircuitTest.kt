@@ -1,6 +1,7 @@
 package dk.maxkandersen.circuit
 
 import dk.maxkandersen.action.gate.CNOTGate
+import dk.maxkandersen.action.gate.CtrlGate
 import dk.maxkandersen.action.gate.HGate
 import dk.maxkandersen.action.gate.IDGate
 import dk.maxkandersen.action.gate.XGate
@@ -122,12 +123,51 @@ class QCircuitTest {
 
     @Test
     fun teleportationWorksCorrectly() {
-        val c = QCircuit(3)
         val psi = QState.random(1)
-        c.setStartState(psi kron b00)
-        c.addAction(CNOTGate().generateMultiGate(0, 1, 3))
-        c.addAction(HGate().expandWithID(0, 3))
-        // NOT FINISHED
+        
+        val c00 = QCircuit(3)
+        c00.setStartState(psi kron b00)
+        c00.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c00.addAction(HGate().expandWithID(0, 3))
+        c00.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.0)))
+        c00.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.0)))
+        c00.addAction(CtrlGate(XGate()).generateMultiGate(1, 2, 3))
+        c00.addAction(CtrlGate(ZGate()).generateMultiGate(0, 2, 3))
+        val res00 = c00.run()
+        assertIdentical(q0 kron q0 kron psi, res00)
+
+        val c10 = QCircuit(3)
+        c10.setStartState(psi kron b00)
+        c10.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c10.addAction(HGate().expandWithID(0, 3))
+        c10.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.9)))
+        c10.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.0)))
+        c10.addAction(CtrlGate(XGate()).generateMultiGate(1, 2, 3))
+        c10.addAction(CtrlGate(ZGate()).generateMultiGate(0, 2, 3))
+        val res10 = c10.run()
+        assertIdentical(q1 kron q0 kron psi, res10)
+
+        val c01 = QCircuit(3)
+        c01.setStartState(psi kron b00)
+        c01.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c01.addAction(HGate().expandWithID(0, 3))
+        c01.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.0)))
+        c01.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.9)))
+        c01.addAction(CtrlGate(XGate()).generateMultiGate(1, 2, 3))
+        c01.addAction(CtrlGate(ZGate()).generateMultiGate(0, 2, 3))
+        val res01 = c01.run()
+        assertIdentical(q0 kron q1 kron psi, res01)
+
+        val c11 = QCircuit(3)
+        c11.setStartState(psi kron b00)
+        c11.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c11.addAction(HGate().expandWithID(0, 3))
+        c11.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.9)))
+        c11.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.9)))
+        c11.addAction(CtrlGate(XGate()).generateMultiGate(1, 2, 3))
+        c11.addAction(CtrlGate(ZGate()).generateMultiGate(0, 2, 3))
+        val res11 = c11.run()
+        assertIdentical(q1 kron q1 kron psi, res11)
     }
 
 }
