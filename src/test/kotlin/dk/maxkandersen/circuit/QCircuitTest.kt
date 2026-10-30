@@ -5,7 +5,10 @@ import dk.maxkandersen.action.gate.HGate
 import dk.maxkandersen.action.gate.IDGate
 import dk.maxkandersen.action.gate.XGate
 import dk.maxkandersen.action.gate.ZGate
+import dk.maxkandersen.action.measure.FullMeasurement
+import dk.maxkandersen.action.measure.SingleQubitMeasurement
 import dk.maxkandersen.qubit.QState
+import dk.maxkandersen.random.FixedRandomStrategy
 import dk.maxkandersen.testutil.Assertions.assertIdentical
 import kotlin.test.Test
 
@@ -84,6 +87,36 @@ class QCircuitTest {
         c.setStartState(q0 kron q0 kron q1)
         val res1 = c.run()
         assertIdentical(q1 kron q0 kron q1, res1)
+    }
+
+    @Test
+    fun singleMeasurementWorksCorrectly() {
+        val c0 = QCircuit(2)
+        c0.addAction(HGate().expand(2))
+        c0.addAction(SingleQubitMeasurement(0, 2, rand = FixedRandomStrategy(0.0)))
+        val res0 = c0.run()
+        assertIdentical(q0 kron qp, res0)
+
+        val c1 = QCircuit(2)
+        c1.addAction(HGate().expand(2))
+        c1.addAction(SingleQubitMeasurement(0, 2, rand = FixedRandomStrategy(0.9)))
+        val res1 = c1.run()
+        assertIdentical(q1 kron qp, res1)
+    }
+
+    @Test
+    fun fullMeasurementWorksCorrectly() {
+        val c0 = QCircuit(2)
+        c0.addAction(HGate().expand(2))
+        c0.addAction(FullMeasurement(2, rand = FixedRandomStrategy(0.0)))
+        val res0 = c0.run()
+        assertIdentical(q0 kron q0, res0)
+
+        val c1 = QCircuit(2)
+        c1.addAction(HGate().expand(2))
+        c1.addAction(FullMeasurement(2, rand = FixedRandomStrategy(0.9)))
+        val res1 = c1.run()
+        assertIdentical(q1 kron q1, res1)
     }
 
 }
