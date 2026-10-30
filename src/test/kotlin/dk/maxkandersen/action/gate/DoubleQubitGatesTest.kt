@@ -1,11 +1,12 @@
 package dk.maxkandersen.action.gate
 
-import dk.maxkandersen.action.gate.CNOTGate
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.testutil.Assertions.assertIdentical
 import kotlin.test.Test
 
 class DoubleQubitGatesTest {
+    val q0 = QState.zero()
+    val q1 = QState.one()
     val q00 = QState.baseState(2)
     val q01 = QState.zero() kron QState.one()
     val q10 = QState.one() kron QState.zero()
@@ -39,5 +40,26 @@ class DoubleQubitGatesTest {
         assertIdentical(q101, out001)
         val out101 = gate.apply(q101)
         assertIdentical(q001, out101)
+    }
+
+    @Test
+    fun testCtrlGateGenerally() {
+        val gates = listOf(XGate(), ZGate(), HGate(), SGate(), TGate())
+        for (gate in gates) {
+            val resGate0 = gate.apply(q0)
+            val resGate1 = gate.apply(q1)
+
+            val resCtrl00 = CtrlGate(gate).apply(q00)
+            assertIdentical(q0 kron q0, resCtrl00)
+
+            val resCtrl01 = CtrlGate(gate).apply(q01)
+            assertIdentical(q0 kron q1, resCtrl01)
+
+            val resCtrl10 = CtrlGate(gate).apply(q10)
+            assertIdentical(q1 kron resGate0, resCtrl10)
+
+            val resCtrl11 = CtrlGate(gate).apply(q11)
+            assertIdentical(q1 kron resGate1, resCtrl11)
+        }
     }
 }
