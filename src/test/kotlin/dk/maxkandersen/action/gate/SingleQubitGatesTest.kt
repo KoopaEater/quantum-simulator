@@ -1,12 +1,5 @@
 package dk.maxkandersen.action.gate
 
-import dk.maxkandersen.action.gate.HadamardGate
-import dk.maxkandersen.action.gate.IDGate
-import dk.maxkandersen.action.gate.PGate
-import dk.maxkandersen.action.gate.SGate
-import dk.maxkandersen.action.gate.TGate
-import dk.maxkandersen.action.gate.XGate
-import dk.maxkandersen.action.gate.ZGate
 import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.testutil.Assertions.assertIdentical
 import org.ejml.data.ZMatrixRMaj
@@ -46,8 +39,8 @@ class SingleQubitGatesTest {
     }
 
     @Test
-    fun testHadamardGate() {
-        val gate = HadamardGate()
+    fun testHGate() {
+        val gate = HGate()
         val out0 = gate.apply(q0)
         assertIdentical(qp, out0)
         val out1 = gate.apply(q1)

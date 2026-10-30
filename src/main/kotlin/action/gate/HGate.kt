@@ -4,7 +4,7 @@ import org.ejml.data.ZMatrixRMaj
 import org.ejml.dense.row.CommonOps_ZDRM
 import kotlin.math.sqrt
 
-class HadamardGate() : SingleQubitGate {
+class HGate() : SingleQubitGate {
     override val matrix = run {
         val m = ZMatrixRMaj(2,2,true,
             1.0, 0.0, 1.0, 0.0,
