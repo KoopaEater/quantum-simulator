@@ -1,10 +1,15 @@
 package dk.maxkandersen.file
 
+import dk.maxkandersen.action.gate.CHGate
+import dk.maxkandersen.action.gate.CSGate
+import dk.maxkandersen.action.gate.CTGate
 import dk.maxkandersen.action.gate.CXGate
+import dk.maxkandersen.action.gate.CZGate
 import dk.maxkandersen.action.gate.DoubleQubitGate
 import dk.maxkandersen.action.gate.Gate
 import dk.maxkandersen.action.gate.HGate
 import dk.maxkandersen.action.gate.IDGate
+import dk.maxkandersen.action.gate.PGate
 import dk.maxkandersen.action.gate.SGate
 import dk.maxkandersen.action.gate.SingleQubitGate
 import dk.maxkandersen.action.gate.TGate
@@ -57,7 +62,17 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
                 "H" -> circuit.addAction(parseSimpleSingleGate(command, args, HGate(), numQubits, lineNum))
                 "S" -> circuit.addAction(parseSimpleSingleGate(command, args, SGate(), numQubits, lineNum))
                 "T" -> circuit.addAction(parseSimpleSingleGate(command, args, TGate(), numQubits, lineNum))
-                "CNOT" -> circuit.addAction(parseSimpleDoubleGate(command, args, CXGate(), numQubits, lineNum))
+                "P" -> {
+                    if (args.size != 2) throw NumArgsException(lineNum, command, "2", args.size)
+                    val theta = args[0].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 1, "a number (angle in radians)", args[0])
+                    val qubit = getQubit(args, 1, numQubits, command, lineNum)
+                    circuit.addAction(PGate(theta).expandWithID(qubit, numQubits))
+                }
+                "CNOT", "CX" -> circuit.addAction(parseSimpleDoubleGate(command, args, CXGate(), numQubits, lineNum))
+                "CZ" -> circuit.addAction(parseSimpleDoubleGate(command, args, CZGate(), numQubits, lineNum))
+                "CH" -> circuit.addAction(parseSimpleDoubleGate(command, args, CHGate(), numQubits, lineNum))
+                "CT" -> circuit.addAction(parseSimpleDoubleGate(command, args, CTGate(), numQubits, lineNum))
+                "CS" -> circuit.addAction(parseSimpleDoubleGate(command, args, CSGate(), numQubits, lineNum))
                 "MEASURE" -> circuit.addAction(parseMeasurement(args, numQubits, lineNum))
                 else -> throw UnknownCommandException(lineNum, command)
             }
