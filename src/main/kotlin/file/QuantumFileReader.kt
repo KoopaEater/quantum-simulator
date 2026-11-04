@@ -6,6 +6,7 @@ import dk.maxkandersen.action.gate.CSGate
 import dk.maxkandersen.action.gate.CTGate
 import dk.maxkandersen.action.gate.CXGate
 import dk.maxkandersen.action.gate.CZGate
+import dk.maxkandersen.action.gate.CtrlGate
 import dk.maxkandersen.action.gate.DoubleQubitGate
 import dk.maxkandersen.action.gate.Gate
 import dk.maxkandersen.action.gate.HGate
@@ -39,18 +40,19 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
         }
 
         val line0 = it.next()
-        val numQubits = line0.split(" ").singleOrNull()?.toIntOrNull()
+        val numQubits = line0.trim().split(" ").singleOrNull()?.toIntOrNull()
             ?: throw NumQubitsException()
+        if (numQubits < 1) throw NumQubitsException()
 
         val circuit = QCircuit(numQubits)
         var lineNum = 1
         while (it.hasNext()) {
-            val line = it.next()
+            val line = it.next().trim()
             lineNum++
 
-            if (line.trim().startsWith("#")) continue
+            if (line.startsWith("#")) continue
 
-            val split = line.split(" ")
+            val split = line.split(Regex("\\s+")) // Split on whitespace
             val command = split[0]
             val args = split.drop(1)
 
@@ -66,8 +68,7 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
                 "P" -> {
                     if (args.size != 2) throw NumArgsException(lineNum, command, "2", args.size)
                     val theta = args[0].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 1, "a number (angle in radians)", args[0])
-                    val qubit = getQubit(args, 1, numQubits, command, lineNum)
-                    circuit.addAction(PGate(theta).expandWithID(qubit, numQubits))
+                    circuit.addAction(parseSimpleSingleGate(command, args, PGate(theta), numQubits, lineNum, argOffset = 1))
                 }
                 "CNOT", "CX" -> circuit.addAction(parseSimpleDoubleGate(command, args, CXGate(), numQubits, lineNum))
                 "CZ" -> circuit.addAction(parseSimpleDoubleGate(command, args, CZGate(), numQubits, lineNum))
@@ -77,9 +78,7 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
                 "CP" -> {
                     if (args.size != 3) throw NumArgsException(lineNum, command, "3", args.size)
                     val theta = args[0].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 1, "a number (angle in radians)", args[0])
-                    val qubit1 = getQubit(args, 1, numQubits, command, lineNum)
-                    val qubit2 = getQubit(args, 2, numQubits, command, lineNum)
-                    circuit.addAction(CPGate(theta).generateMultiGate(qubit1, qubit2, numQubits))
+                    circuit.addAction(parseSimpleDoubleGate(command, args, CPGate(theta), numQubits, lineNum, argOffset = 1))
                 }
                 "MEASURE" -> circuit.addAction(parseMeasurement(args, numQubits, lineNum))
                 else -> throw UnknownCommandException(lineNum, command)
@@ -95,15 +94,16 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
         return qubit
     }
 
-    private fun parseSimpleSingleGate(command: String, args: List<String>, gate: SingleQubitGate, numQubits: Int, lineNum: Int): Gate {
-        if (args.size != 1) throw NumArgsException(lineNum, command, "1", args.size)
-        val qubit = getQubit(args, 0, numQubits, command, lineNum)
+    private fun parseSimpleSingleGate(command: String, args: List<String>, gate: SingleQubitGate, numQubits: Int, lineNum: Int, argOffset: Int = 0): Gate {
+        if (args.size != 1 + argOffset) throw NumArgsException(lineNum, command, "${1+argOffset}", args.size)
+        val qubit = getQubit(args, 0 + argOffset, numQubits, command, lineNum)
         return gate.expandWithID(qubit, numQubits)
     }
-    private fun parseSimpleDoubleGate(command: String, args: List<String>, gate: DoubleQubitGate, numQubits: Int, lineNum: Int): Gate {
-        if (args.size != 2) throw NumArgsException(lineNum, command, "2", args.size)
-        val qubit1 = getQubit(args, 0, numQubits, command, lineNum)
-        val qubit2 = getQubit(args, 1, numQubits, command, lineNum)
+    private fun parseSimpleDoubleGate(command: String, args: List<String>, gate: DoubleQubitGate, numQubits: Int, lineNum: Int, argOffset: Int = 0): Gate {
+        if (args.size != 2 + argOffset) throw NumArgsException(lineNum, command, "${2+argOffset}", args.size)
+        val qubit1 = getQubit(args, 0 + argOffset, numQubits, command, lineNum)
+        val qubit2 = getQubit(args, 1 + argOffset, numQubits, command, lineNum)
+        if (qubit1 == qubit2) throw InvalidArgException(lineNum, command, 1 + argOffset, "unique qubits", "$qubit1 for both")
         return gate.generateMultiGate(qubit1, qubit2, numQubits)
     }
     private fun parseMeasurement(args: List<String>, numQubits: Int, lineNum: Int): Measurement {
