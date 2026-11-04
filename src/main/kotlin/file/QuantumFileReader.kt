@@ -1,6 +1,7 @@
 package dk.maxkandersen.file
 
 import dk.maxkandersen.action.gate.CHGate
+import dk.maxkandersen.action.gate.CPGate
 import dk.maxkandersen.action.gate.CSGate
 import dk.maxkandersen.action.gate.CTGate
 import dk.maxkandersen.action.gate.CXGate
@@ -73,6 +74,13 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
                 "CH" -> circuit.addAction(parseSimpleDoubleGate(command, args, CHGate(), numQubits, lineNum))
                 "CT" -> circuit.addAction(parseSimpleDoubleGate(command, args, CTGate(), numQubits, lineNum))
                 "CS" -> circuit.addAction(parseSimpleDoubleGate(command, args, CSGate(), numQubits, lineNum))
+                "CP" -> {
+                    if (args.size != 3) throw NumArgsException(lineNum, command, "3", args.size)
+                    val theta = args[0].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 1, "a number (angle in radians)", args[0])
+                    val qubit1 = getQubit(args, 1, numQubits, command, lineNum)
+                    val qubit2 = getQubit(args, 2, numQubits, command, lineNum)
+                    circuit.addAction(CPGate(theta).generateMultiGate(qubit1, qubit2, numQubits))
+                }
                 "MEASURE" -> circuit.addAction(parseMeasurement(args, numQubits, lineNum))
                 else -> throw UnknownCommandException(lineNum, command)
             }
