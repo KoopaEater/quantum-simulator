@@ -1,4 +1,4 @@
-package dk.maxkandersen.file
+package dk.maxkandersen.parsing
 
 import dk.maxkandersen.action.gate.CHGate
 import dk.maxkandersen.action.gate.CPGate
@@ -6,7 +6,6 @@ import dk.maxkandersen.action.gate.CSGate
 import dk.maxkandersen.action.gate.CTGate
 import dk.maxkandersen.action.gate.CXGate
 import dk.maxkandersen.action.gate.CZGate
-import dk.maxkandersen.action.gate.CtrlGate
 import dk.maxkandersen.action.gate.DoubleQubitGate
 import dk.maxkandersen.action.gate.Gate
 import dk.maxkandersen.action.gate.HGate
@@ -21,13 +20,15 @@ import dk.maxkandersen.action.measure.FullMeasurement
 import dk.maxkandersen.action.measure.Measurement
 import dk.maxkandersen.action.measure.SingleQubitMeasurement
 import dk.maxkandersen.circuit.QCircuit
-import dk.maxkandersen.file.exception.NumArgsException
-import dk.maxkandersen.file.exception.EmptyFileException
-import dk.maxkandersen.file.exception.InvalidArgException
-import dk.maxkandersen.file.exception.NumQubitsException
-import dk.maxkandersen.file.exception.UnknownCommandException
+import dk.maxkandersen.parsing.paths.PathStrategy
+import dk.maxkandersen.parsing.paths.RelativePathStrategy
+import dk.maxkandersen.parsing.exception.NumArgsException
+import dk.maxkandersen.parsing.exception.EmptyFileException
+import dk.maxkandersen.parsing.exception.InvalidArgException
+import dk.maxkandersen.parsing.exception.NumQubitsException
+import dk.maxkandersen.parsing.exception.UnknownCommandException
 
-class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy()) {
+class QuantumParser(val pathStrategy: PathStrategy = RelativePathStrategy()) {
 
     fun read(filename: String): QCircuit {
         return pathStrategy.open(filename).useLines(::parse)

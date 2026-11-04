@@ -1,4 +1,4 @@
-package dk.maxkandersen.file
+package dk.maxkandersen.parsing.paths
 
 import java.io.BufferedReader
 

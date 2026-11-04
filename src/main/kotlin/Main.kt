@@ -1,10 +1,10 @@
 package dk.maxkandersen
 
-import dk.maxkandersen.file.QuantumFileReader
-import dk.maxkandersen.file.ResourcePathStrategy
+import dk.maxkandersen.parsing.QuantumParser
+import dk.maxkandersen.parsing.paths.ResourcePathStrategy
 
 fun main() {
-    QuantumFileReader().read("C:\\Temp\\test.qcirc")
-    QuantumFileReader(pathStrategy = ResourcePathStrategy()).read("test.qcirc")
+    QuantumParser().read("C:\\Temp\\test.qcirc")
+    QuantumParser(pathStrategy = ResourcePathStrategy()).read("test.qcirc")
 }
 
