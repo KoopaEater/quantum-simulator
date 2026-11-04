@@ -1,3 +1,3 @@
 package dk.maxkandersen.action.gate
 
-class CNOTGate : CtrlGate(XGate())
+class CXGate : CtrlGate(XGate())

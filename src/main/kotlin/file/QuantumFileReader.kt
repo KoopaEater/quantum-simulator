@@ -1,6 +1,6 @@
 package dk.maxkandersen.file
 
-import dk.maxkandersen.action.gate.CNOTGate
+import dk.maxkandersen.action.gate.CXGate
 import dk.maxkandersen.action.gate.DoubleQubitGate
 import dk.maxkandersen.action.gate.Gate
 import dk.maxkandersen.action.gate.HGate
@@ -57,7 +57,7 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
                 "H" -> circuit.addAction(parseSimpleSingleGate(command, args, HGate(), numQubits, lineNum))
                 "S" -> circuit.addAction(parseSimpleSingleGate(command, args, SGate(), numQubits, lineNum))
                 "T" -> circuit.addAction(parseSimpleSingleGate(command, args, TGate(), numQubits, lineNum))
-                "CNOT" -> circuit.addAction(parseSimpleDoubleGate(command, args, CNOTGate(), numQubits, lineNum))
+                "CNOT" -> circuit.addAction(parseSimpleDoubleGate(command, args, CXGate(), numQubits, lineNum))
                 "MEASURE" -> circuit.addAction(parseMeasurement(args, numQubits, lineNum))
                 else -> throw UnknownCommandException(lineNum, command)
             }

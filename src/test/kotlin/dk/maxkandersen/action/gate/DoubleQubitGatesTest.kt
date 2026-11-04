@@ -18,7 +18,7 @@ class DoubleQubitGatesTest {
 
     @Test
     fun testCNOTGate() {
-        val gate = CNOTGate()
+        val gate = CXGate()
         val out00 = gate.apply(q00)
         assertIdentical(q00, out00)
         val out01 = gate.apply(q01)
@@ -31,7 +31,7 @@ class DoubleQubitGatesTest {
 
     @Test
     fun testMultiCNOTGate() {
-        val gate = CNOTGate().generateMultiGate(2, 0, 3)
+        val gate = CXGate().generateMultiGate(2, 0, 3)
         val out000 = gate.apply(q000)
         assertIdentical(q000, out000)
         val out100 = gate.apply(q100)

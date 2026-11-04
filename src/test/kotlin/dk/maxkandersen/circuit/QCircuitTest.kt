@@ -1,6 +1,6 @@
 package dk.maxkandersen.circuit
 
-import dk.maxkandersen.action.gate.CNOTGate
+import dk.maxkandersen.action.gate.CXGate
 import dk.maxkandersen.action.gate.CtrlGate
 import dk.maxkandersen.action.gate.HGate
 import dk.maxkandersen.action.gate.IDGate
@@ -82,7 +82,7 @@ class QCircuitTest {
     @Test
     fun circuitWithMultiGatesWorkCorrectly() {
         val c = QCircuit(3)
-        c.addAction(CNOTGate().generateMultiGate(2, 0, 3))
+        c.addAction(CXGate().generateMultiGate(2, 0, 3))
         val res0 = c.run()
         assertIdentical(q0 kron q0 kron q0, res0)
 
@@ -127,7 +127,7 @@ class QCircuitTest {
         
         val c00 = QCircuit(3)
         c00.setStartState(psi kron b00)
-        c00.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c00.addAction(CXGate().generateMultiGate(0, 1, 3))
         c00.addAction(HGate().expandWithID(0, 3))
         c00.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.0)))
         c00.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.0)))
@@ -138,7 +138,7 @@ class QCircuitTest {
 
         val c10 = QCircuit(3)
         c10.setStartState(psi kron b00)
-        c10.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c10.addAction(CXGate().generateMultiGate(0, 1, 3))
         c10.addAction(HGate().expandWithID(0, 3))
         c10.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.9)))
         c10.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.0)))
@@ -149,7 +149,7 @@ class QCircuitTest {
 
         val c01 = QCircuit(3)
         c01.setStartState(psi kron b00)
-        c01.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c01.addAction(CXGate().generateMultiGate(0, 1, 3))
         c01.addAction(HGate().expandWithID(0, 3))
         c01.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.0)))
         c01.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.9)))
@@ -160,7 +160,7 @@ class QCircuitTest {
 
         val c11 = QCircuit(3)
         c11.setStartState(psi kron b00)
-        c11.addAction(CNOTGate().generateMultiGate(0, 1, 3))
+        c11.addAction(CXGate().generateMultiGate(0, 1, 3))
         c11.addAction(HGate().expandWithID(0, 3))
         c11.addAction(SingleQubitMeasurement(0, 3, rand = FixedRandomStrategy(0.9)))
         c11.addAction(SingleQubitMeasurement(1, 3, rand = FixedRandomStrategy(0.9)))
