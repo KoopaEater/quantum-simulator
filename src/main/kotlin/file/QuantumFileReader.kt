@@ -42,12 +42,13 @@ class QuantumFileReader(val pathStrategy: PathStrategy = RelativePathStrategy())
             val line = it.next()
             lineNum++
 
+            if (line.trim().startsWith("#")) continue
+
             val split = line.split(" ")
             val command = split[0]
             val args = split.drop(1)
 
             if (command.isBlank()) continue
-            // Check for #-comments?
 
             when (command) {
                 "I" -> circuit.addAction(parseSimpleSingleGate(command, args, IDGate(), numQubits, lineNum))
