@@ -1,0 +1,14 @@
+# Teleportation of qubit 0 (psi = |0>) to qubit 2
+# 3 qubits: 0 = state to teleport, 1+2 = quantum channel
+3
+# Create Bell pair on qubits 1 and 2
+H 1
+CNOT 1 2
+# Bell measurement on qubits 0 and 1
+CNOT 0 1
+H 0
+MEASURE 0
+MEASURE 1
+# Corrections on qubit 2 based on the measurement outcomes
+CX 1 2
+CZ 0 2

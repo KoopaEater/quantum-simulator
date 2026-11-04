@@ -3,6 +3,7 @@ package dk.maxkandersen.qubit
 import dk.maxkandersen.random.FixedRandomStrategy
 import dk.maxkandersen.testutil.Assertions.assertEqual
 import dk.maxkandersen.util.norm
+import org.ejml.data.ZMatrixRMaj
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -36,6 +37,14 @@ class QStateTest {
         val r = QState.random(2, FixedRandomStrategy(0.75))
         assertEquals(2, r.nQubits)
         assertEquals(1.0, norm(r.tensor), 1e-12)
+    }
+
+    @Test
+    fun imaginaryAmplitudePrintsCorrectBitstring() {
+        val qi1 = QState(ZMatrixRMaj(2, 1, true,
+            0.0, 0.0,
+            0.0, 1.0))
+        assertEqual("(0.000 + 1.000i)|1>", qi1.asBitStrings())
     }
 
 }

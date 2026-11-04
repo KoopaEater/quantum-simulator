@@ -28,25 +28,32 @@ import dk.maxkandersen.parsing.exception.InvalidArgException
 import dk.maxkandersen.parsing.exception.NumQubitsException
 import dk.maxkandersen.parsing.exception.UnknownCommandException
 
-class QuantumParser(val pathStrategy: PathStrategy = RelativePathStrategy()) {
+class QParser(val pathStrategy: PathStrategy = RelativePathStrategy) {
 
-    fun read(filename: String): QCircuit {
-        return pathStrategy.open(filename).useLines(::parse)
+    fun parse(filename: String): QCircuit {
+        return pathStrategy.open(filename).useLines(::doParse)
     }
 
-    private fun parse(lines: Sequence<String>): QCircuit {
+    private fun doParse(lines: Sequence<String>): QCircuit {
         val it = lines.iterator()
-        if (!it.hasNext()) {
+        var lineNum = 0
+        var header: String? = null
+        while (it.hasNext()) {
+            lineNum++
+            val l = it.next().trim()
+            if (l.isBlank() || l.startsWith("#")) continue
+            header = l
+            break
+        }
+        if (header == null) {
             throw EmptyFileException()
         }
 
-        val line0 = it.next()
-        val numQubits = line0.trim().split(" ").singleOrNull()?.toIntOrNull()
-            ?: throw NumQubitsException()
-        if (numQubits < 1) throw NumQubitsException()
+        val numQubits = header.split(Regex("\\s+")).singleOrNull()?.toIntOrNull()
+            ?: throw NumQubitsException(lineNum)
+        if (numQubits < 1) throw NumQubitsException(lineNum)
 
         val circuit = QCircuit(numQubits)
-        var lineNum = 1
         while (it.hasNext()) {
             val line = it.next().trim()
             lineNum++

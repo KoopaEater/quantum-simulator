@@ -2,8 +2,8 @@ package dk.maxkandersen.parsing.paths
 
 import java.io.BufferedReader
 
-class NoPathJustTextStrategy(val text: String) : PathStrategy {
+object NoPathJustTextStrategy : PathStrategy {
     override fun open(filename: String): BufferedReader {
-        return text.byteInputStream().bufferedReader()
+        return filename.byteInputStream().bufferedReader()
     }
 }
