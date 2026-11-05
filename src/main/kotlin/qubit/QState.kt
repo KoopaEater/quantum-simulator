@@ -22,12 +22,15 @@ class QState(val tensor: ZMatrixRMaj) {
     init {
         require(tensor.numCols == 1) { "QState tensor must be a column vector (Nx1), got ${tensor.numRows}x${tensor.numCols}" }
         require(tensor.numRows >= 2 && (tensor.numRows and (tensor.numRows - 1)) == 0) { "QState tensor must have 2^n rows for n >= 1 qubits, got ${tensor.numRows} rows" }
-        val tol = 1e-12
         val norm = norm(tensor)
-        require(1.0-tol < norm && norm < 1.0+tol) { "QState tensor must have norm 1, got $norm" }
+        require(abs(norm - 1.0) < NORM_TOLERANCE) { "QState tensor must have norm 1 (within $NORM_TOLERANCE), got $norm" }
     }
 
     companion object {
+
+        // Loose enough to admit states written with ~3 decimals (e.g. 0.707 for 1/sqrt(2))
+        const val NORM_TOLERANCE = 1e-2
+
 
         fun zero() = QState(zero)
         fun one() = QState(one)

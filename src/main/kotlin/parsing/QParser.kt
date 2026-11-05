@@ -20,6 +20,7 @@ import dk.maxkandersen.action.measure.FullMeasurement
 import dk.maxkandersen.action.measure.Measurement
 import dk.maxkandersen.action.measure.SingleQubitMeasurement
 import dk.maxkandersen.circuit.QCircuit
+import dk.maxkandersen.qubit.QState
 import dk.maxkandersen.parsing.paths.PathStrategy
 import dk.maxkandersen.parsing.paths.RelativePathStrategy
 import dk.maxkandersen.parsing.exception.NumArgsException
@@ -27,8 +28,11 @@ import dk.maxkandersen.parsing.exception.EmptyFileException
 import dk.maxkandersen.parsing.exception.InvalidArgException
 import dk.maxkandersen.parsing.exception.NumQubitsException
 import dk.maxkandersen.parsing.exception.UnknownCommandException
+import dk.maxkandersen.util.norm
+import org.ejml.data.ZMatrixRMaj
+import kotlin.math.abs
 
-class QParser(val pathStrategy: PathStrategy = RelativePathStrategy) {
+class QParser(val pathStrategy: PathStrategy = RelativePathStrategy()) {
 
     fun parse(filename: String): QCircuit {
         return pathStrategy.open(filename).useLines(::doParse)
@@ -89,6 +93,17 @@ class QParser(val pathStrategy: PathStrategy = RelativePathStrategy) {
                     circuit.addAction(parseSimpleDoubleGate(command, args, CPGate(theta), numQubits, lineNum, argOffset = 1))
                 }
                 "MEASURE" -> circuit.addAction(parseMeasurement(args, numQubits, lineNum))
+                "INITSTATE" -> {
+                    if (args.size != 2) throw NumArgsException(lineNum, command, "2", args.size)
+                    when (args[0]) {
+                        "BASIS" -> circuit.setStartState(parseBasisState(args[1], numQubits, lineNum, command))
+                        "FILE" -> {
+                            val stateLines = pathStrategy.open(args[1]).useLines { it.filter { l -> l.isNotBlank() }.toList() }
+                            circuit.setStartState(parseStateFile(stateLines, numQubits, lineNum, command))
+                        }
+                        else -> throw InvalidArgException(lineNum, command, 1, "BASIS or FILE", args[0])
+                    }
+                }
                 else -> throw UnknownCommandException(lineNum, command)
             }
 
@@ -114,6 +129,30 @@ class QParser(val pathStrategy: PathStrategy = RelativePathStrategy) {
         if (qubit1 == qubit2) throw InvalidArgException(lineNum, command, 1 + argOffset, "unique qubits", "$qubit1 for both")
         return gate.generateMultiGate(qubit1, qubit2, numQubits)
     }
+    private fun parseStateFile(stateLines: List<String>, numQubits: Int, lineNum: Int, command: String): QState {
+        val expected = 1 shl numQubits
+        if (stateLines.size != expected) throw InvalidArgException(lineNum, command, 2, "a state file with $expected lines (one '<real> <imag>' per basis state)", "${stateLines.size} lines")
+        val tensor = ZMatrixRMaj(expected, 1)
+        stateLines.forEachIndexed { i, line ->
+            val parts = line.trim().split(Regex("\\s+"))
+            if (parts.size != 2) throw InvalidArgException(lineNum, command, 2, "lines of '<real> <imag>' in the state file", "line ${i + 1} of state file: '$line'")
+            val re = parts[0].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 2, "a real number in the state file", "line ${i + 1} of state file: '${parts[0]}'")
+            val im = parts[1].toDoubleOrNull() ?: throw InvalidArgException(lineNum, command, 2, "an imaginary number in the state file", "line ${i + 1} of state file: '${parts[1]}'")
+            tensor.set(i, 0, re, im)
+        }
+        if (abs(norm(tensor) - 1.0) > QState.NORM_TOLERANCE) throw InvalidArgException(lineNum, command, 2, "a normalized state (norm 1) in the state file", "norm ${norm(tensor)}")
+        return QState(tensor)
+    }
+
+    private fun parseBasisState(arg: String, numQubits: Int, lineNum: Int, command: String): QState {
+        val bits = Regex("\\|([01]+)>").matchEntire(arg)?.groupValues?.get(1)
+            ?: throw InvalidArgException(lineNum, command, 2, "a basis state like |001>", arg)
+        if (bits.length != numQubits) throw InvalidArgException(lineNum, command, 2, "a basis state of $numQubits qubits", arg)
+        val tensor = ZMatrixRMaj(1 shl numQubits, 1)
+        tensor.setReal(bits.toInt(2), 0, 1.0)
+        return QState(tensor)
+    }
+
     private fun parseMeasurement(args: List<String>, numQubits: Int, lineNum: Int): Measurement {
         if (args.size !in 0..1) throw NumArgsException(lineNum, "MEASURE", "0-1", args.size)
         if (args.isEmpty()) {
