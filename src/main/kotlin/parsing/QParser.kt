@@ -28,11 +28,13 @@ import dk.maxkandersen.parsing.exception.EmptyFileException
 import dk.maxkandersen.parsing.exception.InvalidArgException
 import dk.maxkandersen.parsing.exception.NumQubitsException
 import dk.maxkandersen.parsing.exception.UnknownCommandException
+import dk.maxkandersen.random.RandomStrategy
+import dk.maxkandersen.random.StandardRandomStrategy
 import dk.maxkandersen.util.norm
 import org.ejml.data.ZMatrixRMaj
 import kotlin.math.abs
 
-class QParser(val pathStrategy: PathStrategy = RelativePathStrategy()) {
+class QParser(val pathStrategy: PathStrategy = RelativePathStrategy(), val rand: RandomStrategy = StandardRandomStrategy()) {
 
     fun parse(filename: String): QCircuit {
         return pathStrategy.open(filename).useLines(::doParse)
@@ -156,10 +158,10 @@ class QParser(val pathStrategy: PathStrategy = RelativePathStrategy()) {
     private fun parseMeasurement(args: List<String>, numQubits: Int, lineNum: Int): Measurement {
         if (args.size !in 0..1) throw NumArgsException(lineNum, "MEASURE", "0-1", args.size)
         if (args.isEmpty()) {
-            return FullMeasurement(numQubits)
+            return FullMeasurement(numQubits, rand = rand)
         } else {
             val qubit = getQubit(args, 0, numQubits, "MEASURE", lineNum)
-            return SingleQubitMeasurement(qubit, numQubits)
+            return SingleQubitMeasurement(qubit, numQubits, rand = rand)
         }
     }
 

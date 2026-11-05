@@ -107,6 +107,16 @@ class QState(val tensor: ZMatrixRMaj) {
         return terms.joinToString(" + ")
     }
 
+    fun probabilities(): Map<String, Double> {
+        val map = mutableMapOf<String, Double>()
+        for (i in 0 until tensor.numRows) {
+            val re = tensor.getReal(i, 0)
+            val im = tensor.getImag(i, 0)
+            map[i.toString(2).padStart(nQubits, '0')] = re * re + im * im
+        }
+        return map
+    }
+
     infix fun isIdenticalTo(other: QState): Boolean {
         val tol = 1e-12
         return MatrixFeatures_ZDRM.isEquals(this.tensor, other.tensor, tol)
